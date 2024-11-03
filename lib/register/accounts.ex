@@ -1,9 +1,9 @@
 defmodule Register.Accounts do
   use Ash.Domain,
+    extensions: [AshAdmin.Domain]
 
-  extensions: [AshAdmin.Domain]
   admin do
-    show? true
+    show?(true)
   end
 
   resources do

@@ -1,4 +1,4 @@
-defmodule AshAdmin.AshAdminActorPlug do
+defmodule RegisterWeb.AshAdminActorPlug do
   @moduledoc false
   @behaviour AshAdmin.ActorPlug
 

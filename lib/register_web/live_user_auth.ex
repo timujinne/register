@@ -9,15 +9,16 @@ defmodule RegisterWeb.LiveUserAuth do
   # Параметр для проверки, что пользователь является администратором
   def on_mount(:admins_only, _params, _session, socket) do
     cond do
-      socket.assigns[:current_user]
-      && socket.assigns[:current_user].id == "0ecf9e6d-7b14-4721-add4-be00c0b7f813" ->
-      {:cont, socket}
-     socket.assigns[:current_user]  ->
-      # Назначаем flash-сообщение, что доступ только для администраторов
-      socket = Phoenix.LiveView.put_flash(socket, :error, "only admins has access")
-      {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/")}
-      true  ->
-      {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/sign-in")}
+      socket.assigns[:current_user] &&
+          socket.assigns[:current_user].id == "0ecf9e6d-7b14-4721-add4-be00c0b7f813" ->
+        {:cont, socket}
+
+      socket.assigns[:current_user] ->
+        socket = Phoenix.LiveView.put_flash(socket, :error, "only admins has access")  # flash-сообщение, что доступ только для администраторов
+        {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/")}
+
+      true ->
+        {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/sign-in")}
     end
   end
 

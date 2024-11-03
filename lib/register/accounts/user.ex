@@ -6,10 +6,6 @@ defmodule Register.Accounts.User do
     extensions: [AshAuthentication, AshAdmin.Resource],
     data_layer: AshPostgres.DataLayer
 
-  admin do
-    actor? true
-  end
-
   authentication do
     tokens do
       enabled? true
@@ -40,6 +36,10 @@ defmodule Register.Accounts.User do
   postgres do
     table "users"
     repo Register.Repo
+  end
+
+  admin do
+    actor?(true)
   end
 
   actions do
@@ -127,6 +127,18 @@ defmodule Register.Accounts.User do
       # validates that the password matches the confirmation
       validate AshAuthentication.Strategy.Password.PasswordConfirmationValidation
 
+      # Валидация допустимых значений для `role`  # ++<=Tim
+      # validate {Ash.Resource.Validation.BelongsTo, field: :role, values: ["user", "admin"]}
+      # validate {Ash.Resource.Validation.Inclusion, field: :role, values: ["user", "admin"]}
+      # validate fn changeset ->
+      #   role = Ash.Changeset.get_attribute(changeset, :role)
+      #   if role in ["user", "admin"] do
+      #     :ok
+      #   else
+      #     {:error, "Role must be either 'user' or 'admin'"}
+      #   end
+      # end
+
       metadata :token, :string do
         description "A JWT that can be used to authenticate the user."
         allow_nil? false
@@ -196,6 +208,12 @@ defmodule Register.Accounts.User do
     policy always() do
       forbid_if always()
     end
+
+    # политика для контроля над админ
+    policy always() do
+      authorize_if expr(role == "admin")
+      forbid_if expr(role != "admin")
+    end
   end
 
   attributes do
@@ -210,6 +228,12 @@ defmodule Register.Accounts.User do
       allow_nil? false
       sensitive? true
     end
+# Добавляем атрибут `role`
+    attribute :role, :string do
+      allow_nil? false
+      default "user"
+    end
+
   end
 
   identities do

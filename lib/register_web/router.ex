@@ -3,8 +3,6 @@ defmodule RegisterWeb.Router do
 
   use AshAuthentication.Phoenix.Router
 
-
-
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -24,7 +22,6 @@ defmodule RegisterWeb.Router do
     pipe_through :browser
 
     ash_authentication_live_session :authenticated_routes do
-
       # in each liveview, add one of the following at the top of the module:
       #
       # If an authenticated user must be present:
@@ -57,6 +54,7 @@ defmodule RegisterWeb.Router do
     # Remove this if you do not want to use the reset password feature
     reset_route(auth_routes_prefix: "/auth")
   end
+
   scope "/" do
     # use RegisterWeb, :live_view
     pipe_through [:browser]
@@ -65,29 +63,30 @@ defmodule RegisterWeb.Router do
     #  ash_admin "/admin", on_mount: [{RegisterWeb.LiveUserAuth, :admins_only}]
     # ash_admin "/csp/admin", live_session_name: :ash_admin_csp, csp_nonce_assign_key: :csp_nonce_value
     # ash_admin("/admin", reset_path: "/admin",register_path: "/admin", on_mount: [{RegisterWeb.LiveUserAuth, :live_user_required} ])
-
   end
 
   ash_authentication_live_session :admin_dashboard,
-  on_mount: [{RegisterWeb.LiveUserAuth, :admins_only}], #:admins_only<- notice this
-  session: {AshAdmin.Router, :__session__, [%{"prefix" => "/admin"}, []]},
-  root_layout: {AshAdmin.Layouts, :root} do
-  scope "/" do
-    pipe_through :browser
+    # :admins_only<- notice this
+    on_mount: [{RegisterWeb.LiveUserAuth, :admins_only}],
+    session: {AshAdmin.Router, :__session__, [%{"prefix" => "/admin"}, []]},
+    root_layout: {AshAdmin.Layouts, :root} do
+    scope "/" do
+      pipe_through :browser
 
-    live "/admin/*route",
-         AshAdmin.PageLive,
-         :page,
-         private: %{
-           live_socket_path: "/live",
-           ash_admin_csp_nonce: %{
-             img: "ash_admin-Ed55GFnX",
-             style: "ash_admin-Ed55GFnX",
-             script: "ash_admin-Ed55GFnX"
+      live "/admin/*route",
+           AshAdmin.PageLive,
+           :page,
+           private: %{
+             live_socket_path: "/live",
+             ash_admin_csp_nonce: %{
+               img: "ash_admin-Ed55GFnX",
+               style: "ash_admin-Ed55GFnX",
+               script: "ash_admin-Ed55GFnX"
+             }
            }
-         }
     end
   end
+
   # Other scopes may use custom stacks.
   # scope "/api", RegisterWeb do
   #   pipe_through :api
